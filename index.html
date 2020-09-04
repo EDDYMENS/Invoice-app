@@ -1,0 +1,335 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>.</title>
+    <style>
+    .invoice-box {
+        max-width: 800px;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+        font-size: 16px;
+        line-height: 24px;
+        font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+        color: #555;
+    }
+    
+    .invoice-box table {
+        width: 100%;
+        line-height: inherit;
+        text-align: left;
+    }
+    
+    .invoice-box table td {
+        padding: 5px;
+        vertical-align: top;
+        font-size: 12px;
+    }
+    
+    .invoice-box table tr td:nth-child(2) {
+        text-align: right;
+    }
+    
+    .invoice-box table tr.top table td {
+        padding-bottom: 20px;
+    }
+    
+    .invoice-box table tr.top table td.title {
+        font-size: 45px;
+        line-height: 45px;
+        color: #333;
+    }
+    
+    .invoice-box table tr.information table td {
+        padding-bottom: 40px;
+    }
+    
+    .list-heading,
+    .invoice-box table tr.heading td {
+        background: #3a3a3a;
+        color: #fff;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+        padding-left: 5%;
+    }
+    
+    .invoice-box table tr.details td {
+        padding-bottom: 20px;
+    }
+
+    .invoice-box table tr.heading td:nth-child(1),
+    .invoice-box table tr.item  td:nth-child(1) {
+      padding-left: 1px;
+    }
+
+    .list-item,
+    .invoice-box table tr.item td{
+        border-bottom: 1px solid #eee;
+        padding-left: 10%;
+    }
+    
+    .invoice-box table tr.item.last td {
+        border-bottom: none;
+    }
+    
+    .invoice-box table tr.heading td:nth-child(4),
+    .invoice-box table tr.item  td:nth-child(4),
+    .invoice-box table tr.total td:nth-child(4) {
+        border-top: 2px solid #eee;
+        margin-left: 100%;
+        text-align: right;
+    }
+    
+    .invoice-box table tr.total td:nth-child(4) {
+      font-weight: bold;
+    }
+    @media only screen and (max-width: 600px) {
+        .invoice-box table tr.top table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+        
+        .invoice-box table tr.information table td {
+            width: 100%;
+            display: block;
+            text-align: center;
+        }
+    }
+    
+    /** RTL **/
+    .rtl {
+        direction: rtl;
+        font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+    }
+    
+    .rtl table {
+        text-align: right;
+    }
+    
+    .rtl table tr td:nth-child(2) {
+        text-align: left;
+    }
+    @media print
+    {
+      body { visibility: hidden; }
+      .invoice-box * { visibility: visible; }
+    }
+
+    .invoice-box, .all-invoice-btn {
+      /* display: none; */
+    }
+
+    .center {
+      text-align: -webkit-center;
+    }
+    </style>
+</head>
+
+<body>
+  <div id="invoice-app">
+  Stats
+    <div class="invoice-box">
+        <table cellpadding="0" cellspacing="0">
+            <tr class="top">
+                <td colspan="4">
+                    <table>
+                        <tr>
+                            <td class="title">
+                                <img v-bind:src="logo" style="width:100%; max-width:300px;">
+                            </td>
+                            
+                            <td>
+                             <h1>INVOICE</h1>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            
+            <tr class="information">
+                <td colspan="4">
+                    <table id="invoiceTable">
+                        <tr>
+                            <td>
+                              <b>Name: Edmond Mensah</b><br>
+                              Contact: +352621464709<br>
+                              Email: edmond@devless.io<br>
+                              Address: Aluguntuguntu St. East Legon, Accra Ghana<br>
+                              <br>
+                              Bill To:<br>
+                              <b><span id="currentInvoiceBillTo"></span></b><br>
+                            </td>
+                            <td>
+                              Invoice number: <span id="currentInvoiceNumber"></span><br>
+                              Project: <span id="currentInvoiceProject"></span><br>
+                              Date: <span id="currentInvoiceMonth"></span> <span id="currentInvoiceDay"></span>, <span id="currentInvoiceYear"></span><br>
+                              <b>Balance Due: <span id="currentInvoiceCurrency"></span><span id="currentInvoiceTotal2"></span></b>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="heading" id="invoiceHeading">
+                <td>
+                    Item
+                </td>
+                <td>
+                  Rate(<span id="currentInvoiceCurrency1"></span>)
+              </td>
+                <td>
+                  Hours(hr)
+              </td>
+                <td>
+                    Amount
+                </td>
+            </tr>
+            <tbody id="itemSlot">
+            </tbody>
+            <tr class="total" id="totalDisplay">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                   Total: <span id="currentInvoiceCurrency2"></span><span id="currentInvoiceTotal"></span>
+                </td>
+            </tr>
+        </table>
+        <tr class="information">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td><span id="currentInvoiceExtra"></span></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+    </div>
+  
+  <br>
+  <div class="center">
+  </div>
+    <br>
+    <div class="center">
+      Stats:<br>
+      <div v-for="projectRevenue in projectRevenueList">{{projectRevenue.project}} total revenue: {{projectRevenue.revenue}}</div>
+      <div v-if="selectedSum">Selected Sum: {{selectedSum}}</div>
+      <br>
+      Total revenue: {{totalRevenue}}
+      <br>
+      <br>
+    <div class="invoice-list center">
+      <table>
+        <tr class="list-heading">
+          <td>Sum</td>
+          <td>Invoice number</td>
+          <td>Project</td>
+          <td>Date</td>
+          <td>Amount</td>
+          <td>Options</td>
+        </tr>
+        <tr class="list-item" v-for="invoice in invoices">
+          <td><input type="checkbox" :value="sumItems(invoice)" v-model="checkedSums" @change="addToSum()"></td>
+          <td>#{{invoice.number}}</td>
+          <td>{{invoice.project}}</td>
+          <td>{{invoice.month}} {{invoice.day}}, {{invoice.year}}</td>
+          <td>{{invoice.currencySymbol}}{{sumItems(invoice)}}</td>
+          <td><button v-on:click="populateTemplate(invoice)">View</button></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
+<script src="assets/vue.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/invoices.js"></script>
+<script>
+  var invoice = new Vue({
+    el: '#invoice-app', 
+    data: { 
+      invoices: window.invoices.reverse(),
+      projects: window.projects,
+      logo: window.logo,
+      totalRevenue: 0, 
+      projectRevenueList: [],
+      checkedSums: [],
+      selectedSum: 0,
+    },
+    mounted(){
+      this.totalRevenue = this.sumRevenues(this.invoices);
+      this.projectRevenueList = this.revenueByProject(this.projects, this.invoices);
+    },
+    methods: {
+      addToSum(amount) {
+        this.selectedSum = this.roundNumber(this.checkedSums.reduce((a, b) => a + b, 0));
+      },
+      roundNumber(number) {
+        return Math.round((number + Number.EPSILON) * 100) / 100
+      },
+      sumRevenues(invoices) {
+        var size = invoices.length;
+        var total = 0;
+        for(var i = 0; i < size; i++) {
+          total +=  this.sumItems(invoices[i]);
+        }
+        return this.roundNumber(total);
+      },
+      revenueByProject(projects, invoices) {
+        var projectSize = projects.length;
+        projectRevenue = [];
+        for(var i = 0; i < projectSize; i++) {
+          var projectName = projects[i];
+          var invoiceSize = invoices.length;
+          var revenue = 0;
+          for(var j = 0; j < invoiceSize; j++) {
+            var currentInvoice = invoices[j];
+            if(currentInvoice.project == projectName) {
+              revenue += this.sumItems(currentInvoice);
+            }
+          }
+          projectRevenue.push({project:projectName, revenue: this.roundNumber(revenue)})
+        }
+        return projectRevenue;
+      },
+      sumItems(invoice) {
+        size = invoice.items.length;
+        var sum = 0;
+        for(var i = 0; i < size; i++) {
+          sum += invoice.items[i].rate * invoice.items[i].hours;
+        }
+        return this.roundNumber(sum);
+      }, 
+      populateTemplate(invoice) {
+        currentInvoiceProject.innerText = invoice.project;
+        currentInvoiceNumber.innerText = invoice.number;
+        currentInvoiceDay.innerText = invoice.day;
+        currentInvoiceMonth.innerText = invoice.month;
+        currentInvoiceYear.innerText = invoice.year;
+        currentInvoiceBillTo.innerText = invoice.billTo;
+        currentInvoiceCurrency.innerText = invoice.currencySymbol;
+        currentInvoiceCurrency1.innerText = invoice.currencySymbol;
+        currentInvoiceCurrency2.innerText = invoice.currencySymbol;
+        currentInvoiceExtra.innerHTML = invoice.extra;
+        currentInvoiceTotal.innerText = this.sumItems(invoice);
+        currentInvoiceTotal2.innerText = this.sumItems(invoice);
+        this.renderItems(invoice.items);
+      },
+      renderItems(items) {
+        var size = items.length;
+        var finalRender = "";
+        for(var i=0; i < size; i++) {
+          var item = items[i];
+          finalRender += '<tr class="item"><td>'+item.name+'</td><td>'+item.rate+'</td><td>'+item.hours+'</td><td>'+this.getItemCharge(item)+'</td></tr>';
+        }
+        itemSlot.innerHTML = finalRender;
+      },
+      getItemCharge(item) {
+        return this.roundNumber(item.hours * item.rate);
+      }
+    }
+  })
+</script>
